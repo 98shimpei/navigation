@@ -44,8 +44,7 @@ namespace recede_recovery {
 RecedeRecovery::RecedeRecovery(): global_costmap_(NULL), local_costmap_(NULL),
   tf_(NULL), initialized_(false), world_model_(NULL) {}
 
-void RecedeRecovery::initialize(std::string name, tf::TransformListener* tf,
-    costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap){
+void RecedeRecovery::initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap){
   if(!initialized_){
     name_ = name;
     tf_ = tf;
@@ -119,7 +118,7 @@ void RecedeRecovery::runBehavior(){
   ros::Publisher vel_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 10);
 
   // nav_msgs::Path visited_path_;
-  tf::Stamped<tf::Pose> global_pose;
+  geometry_msgs::PoseStamped global_pose;
   nav_msgs::Path visited_path = *visited_path_;
   int goal_itr = visited_path.poses.size() - 1;
   double dist;
@@ -130,10 +129,18 @@ void RecedeRecovery::runBehavior(){
   while(n.ok()){
     local_costmap_->getRobotPose(global_pose);
 
-    double robot_x = global_pose.getOrigin().x();
-    double robot_y = global_pose.getOrigin().y();
-    double robot_theta = tf::getYaw(global_pose.getRotation());
-    double norm_angle = angles::normalize_angle(tf::getYaw(global_pose.getRotation()));
+    //double robot_x = global_pose.getOrigin().x();
+    //double robot_y = global_pose.getOrigin().y();
+    //double robot_theta = tf::getYaw(global_pose.getRotation());
+    //double norm_angle = angles::normalize_angle(tf::getYaw(global_pose.getRotation()));
+    double robot_x = global_pose.pose.position.x;
+    double robot_y = global_pose.pose.position.y;
+    tf::Quaternion tmp_quat;
+    double roll, pitch, yaw;
+    quaternionMsgToTF(global_pose.pose.orientation, tmp_quat);
+    tf::Matrix3x3(tmp_quat).getRPY(roll, pitch, yaw);
+    double robot_theta = yaw;
+    double norm_angle = angles::normalize_angle(yaw);
 
     ROS_WARN("[Recede Recovery] Robot pose");
     ROS_WARN("x : %lf  y : %lf  yaw : %lf  normalized yaw : %lf", robot_x, robot_y, robot_theta, norm_angle);

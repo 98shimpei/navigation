@@ -66,8 +66,7 @@ namespace recede_recovery{
        * @param global_costmap A pointer to the global_costmap used by the navigation stack
        * @param local_costmap A pointer to the local_costmap used by the navigation stack
        */
-      void initialize(std::string name, tf::TransformListener* tf,
-          costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap);
+      void initialize(std::string name, tf2_ros::Buffer* tf, costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap);
 
       /**
        * @brief  Run the RecedeRecovery recovery behavior.
@@ -85,7 +84,7 @@ namespace recede_recovery{
       costmap_2d::Costmap2DROS* global_costmap_, *local_costmap_;
       costmap_2d::Costmap2D costmap_;
       std::string name_;
-      tf::TransformListener* tf_;
+      tf2_ros::Buffer* tf_;
       bool initialized_;
       // double sim_granularity_, min_rotational_vel_, max_rotational_vel_, acc_lim_th_, tolerance_, frequency_;
       double sim_granularity_, frequency_;
